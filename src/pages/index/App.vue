@@ -7,7 +7,7 @@
 
       <el-main>
         <transition :name="transitionName">
-          <router-view class="child-view" ref="childView"></router-view>
+          <router-view class="child-absolute-view" ref="childView"></router-view>
         </transition>
         <div class="page-component-up" style>
           <i class="el-icon-caret-top"></i>
@@ -31,10 +31,6 @@ export default {
   components: {
     myHeader
   },
-  updated() {
-    
-    console.log(this.$refs.childView)
-  },
 
 }
 </script>
@@ -56,6 +52,10 @@ header {
   width: 100%; /* 宽度设置为100% */
   height: 40px !important;
   z-index: 99; /* 层叠顺序，数值越大就越高。页面滚动的时候就不会被其他内容所遮挡。 */
+}
+
+main{
+  margin: 100px,0
 }
 
 .nav-mask {
@@ -90,7 +90,7 @@ main {
   margin-top: 20px;
 }
 
-.child-view {
+.child-absolute-view{
   left: 0;
   right: 0;
   position: absolute;

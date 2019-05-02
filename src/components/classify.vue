@@ -2,7 +2,7 @@
   <div id="classify">
     <el-row>
       <el-upload
-        ref="uploadBody"
+        ref="upload"
         class="upload-body"
         :action="url"
         :headers="headers"
@@ -10,6 +10,7 @@
         :on-success="handleSuccess"
         :on-progress="handleProgress"
         :on-remove="handleRemove"
+        :on-exceed="handleExceed"
         drag
         :multiple="false"
         accept="image/*"
@@ -28,13 +29,24 @@
         :plain="true"
         size="small"
         type="primary"
-        v-show="!loadingFlag"
+        v-show="activeName=='classify'"
         @click="clickUpload()"
       >
         识别
-        <i class="el-icon-upload el-icon--right"></i>
+        <i class="el-icon-upload"></i>
       </el-button>
-      <i class="el-icon-loading" v-show="loadingFlag"></i>
+      <i class="el-icon-loading" v-show="activeName=='load'"></i>
+      
+      <el-button
+        :plain="true"
+        size="small"
+        type="danger"
+        v-show="activeName=='clear'"
+        @click="clearFiles()"
+      >
+        清空
+        <i class="el-icon-delete"></i>
+      </el-button>
     </el-row>
   </div>
 </template>
@@ -51,7 +63,8 @@ export default {
       resData: null,
       openMessageType: null,
       openMessageInfo: null,
-      loadingFlag: false
+      loadingFlag: false,
+      activeName:"classify"
     }
   },
 
@@ -63,29 +76,38 @@ export default {
         this.openMessageInfo = "识别成功" + "\n" + res.tag
         this.openMessageType = "success"
 
-        this.$bus.$emit("classifyResult", res.tag)
-        this.$bus.$emit("showWin", true)
+        this.$bus.$emit("classify", true, res.tag)
       }
       else {
         this.openMessageInfo = "识别失败"
         this.openMessageType = "warning"
       }
       this.openMessage()
-      this.loadingFlag = false
+      this.activeName = "clear"
 
     },
 
     handleRemove() {
-      this.$bus.$emit("showWin", false)
-    },
-
-    clickUpload() {
-      this.$refs.uploadBody.submit();
-      // this.loadingFlag = true
+      this.$bus.$emit("classify", false)
+      this.activeName="classify"
     },
 
     handleProgress(event, file, fileList) {
-      this.loadingFlag = true
+      this.activeName = "load"
+    },
+
+    handleExceed(files, fileList) {
+      
+    },
+
+    clearFiles(){
+      this.$refs.upload.clearFiles()
+      this.handleRemove()
+    },
+
+    clickUpload() {
+      this.$refs.upload.submit();
+      // this.loadingFlag = true
     },
 
     openMessage() {

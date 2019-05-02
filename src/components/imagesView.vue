@@ -2,6 +2,7 @@
   <div id="image-view">
     <el-row type="flex" class="row-image-body" justify="center">
       <el-col :md="18" :sm="24">
+      <get-height>
         <transition :name="transitionName">
           <div class="image-win related-image-win" v-if="show" key="a">
             <el-card
@@ -30,13 +31,14 @@
             </el-card>
           </div>
         </transition>
-        <div id="image-win-brother" :style="{height:imageWinHeight+'px'}"></div>
+        </get-height>
+  
       </el-col>
     </el-row>
 
     <el-row type="flex" justify="end">
       <el-col :span="3" :pull="3">
-        <el-button type="success" round icon="el-icon-refresh" @click="show = !show,loadImgs()">换一批</el-button>
+        <el-button type="success" round icon="el-icon-refresh" @click="show = !show,shiftImgs()">换一批</el-button>
       </el-col>
     </el-row>
   </div>
@@ -50,11 +52,10 @@ export default {
     show: true,
     imgs1: [],
     imgs2: [],
-    resData: null,
-    imageWinHeight: null,
     flag: 0, //0为第一次加载，1为当前活动窗口为imgs1，2为当前活动窗口为imgs2
     transitionName: 'fade', //初始fade效果为fade
-    tag: ""
+    tag: "",
+    respFlag: false //标记一个获得数据的flag
   }),
 
   methods: {
@@ -64,17 +65,19 @@ export default {
           params:
             { tag: this.tag, num: "10" }
         })
-        .then(response => imgURLProcess(response.data, imgs)
+        .then(response => {
+          imgURLProcess(response.data, imgs)
+          this.respFlag = true
+        }
         )
     },
 
-    loadImgs() {
-
+    shiftImgs() {
       if (this.flag === 0) { //第一次加载，imgs1和imgs2的数据都要进行获取
         this.fetchImgs(this.imgs1)
         this.fetchImgs(this.imgs2)
         this.flag = 1
-        this.transitionName = 'slide-right' //fade效果变更
+        this.transitionName = 'slide-fade-right' //fade效果变更
       }
       else if (this.flag === 1) {//切换为imgs2，刷新imgs1数据
         this.imgs1 = []
@@ -97,36 +100,28 @@ export default {
 
   mounted() {
 
-    window.onresize = () => { // 定义窗口大小变更通知事件
-      this.imageWinHeight = document.getElementsByClassName("related-image-win")[0].offsetHeight
-    }
+  },
 
-    this.$bus.$on("classifyResult",
-      msg => {
-        console.log(msg)
-        this.tag = msg
-        this.loadImgs()
+
+  created() {
+      this.$bus.$on("classifyResult",
+      tag => {
+        if(tag != null){
+          this.tag = tag
+          this.shiftImgs()
+        }
       }
     )
-
-
-
   },
 
   updated() {
-    let height = document.getElementsByClassName("related-image-win")[0].offsetHeight
-    if (height != 0) { //防止出现数据刷新过快（频繁点击事件），找不到元素，height为0的bug
-      this.imageWinHeight = height
-    }
+
   },
+
 
 }
 </script>
 <style>
-#image-view {
-  margin-top: 20px;
-}
-
 .row-image-body {
   position: relative;
 }

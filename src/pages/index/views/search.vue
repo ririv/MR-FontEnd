@@ -2,6 +2,7 @@
   <div id="search">
     <el-row type="flex" class="row-image-body" justify="center">
       <el-col :md="18" :sm="24">
+      <get-height>
         <transition :name="transitionName">
           <div class="image-win search-image-win" v-if="show" key="a">
             <el-card
@@ -30,7 +31,7 @@
             </el-card>
           </div>
         </transition>
-        <div id="image-win-brother" :style="{height:imageWinHeight+'px'}"></div>
+        </get-height>
       </el-col>
     </el-row>
 
@@ -56,7 +57,7 @@ export default {
       show: true,
       currentPage: 1,//给其设置默认值
       currentContent: [],
-      imageWinHeight: null,
+      // imageWinHeight: null,
       totalElements: null,
       transitionName: "fade",
       pageSize: 20
@@ -92,9 +93,7 @@ export default {
   },
 
   mounted() {
-      window.onresize = () => { // 定义窗口大小变更通知事件
-      this.imageWinHeight = document.getElementsByClassName("search-image-win")[0].offsetHeight
-    }
+
   },
 
   watch: {
@@ -111,7 +110,7 @@ export default {
 
       const toPage = parseInt(to)
       const fromPage = parseInt(from)
-      // this.transitionName = toPage > fromPage ? 'slide-right' : 'slide-left'
+      // this.transitionName = toPage > fromPage ? 'slide-fade-right' : 'slide-fade-left'
 
     },
 
@@ -125,13 +124,6 @@ export default {
       this.fetchData()
     },
 
-  },
-
-  updated() {
-    let height = document.getElementsByClassName("search-image-win")[0].offsetHeight
-    if (height != 0) { //防止出现数据刷新过快（频繁点击事件），找不到元素，height为0的bug
-      this.imageWinHeight = height
-    }
   },
 
 }
