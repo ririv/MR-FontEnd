@@ -2,43 +2,50 @@
   <div id="image-view">
     <el-row type="flex" class="row-image-body" justify="center">
       <el-col :md="18" :sm="24">
-      <get-height>
-        <transition :name="transitionName">
-          <div class="image-win related-image-win" v-if="show" key="a">
-            <el-card
-              :body-style="{ padding: '0px'}"
-              v-for="img in imgs1"
-              :key="img.id"
-              class="image-card"
-              shadow="hover"
-            >
-              <el-button class="button-open-img" type="text" @click="openImg(img.value)">
-                <img :src="img.value" class="image">
-              </el-button>
-            </el-card>
-          </div>
-          <div class="image-win related-image-win" v-else key="b">
-            <el-card
-              :body-style="{ padding: '0px'}"
-              v-for="img in imgs2"
-              :key="img.id"
-              class="image-card"
-              shadow="hover"
-            >
-              <el-button class="button-open-img" type="text" @click="openImg(img.value)">
-                <img :src="img.value" class="image">
-              </el-button>
-            </el-card>
-          </div>
-        </transition>
+        <get-height :keep-alive="true">
+          <transition :name="transitionName">
+            <div class="image-win related-image-win image-1" v-if="flag==0||flag==1" key="a">
+              <el-card
+                :body-style="{ padding: '0px'}"
+                v-for="img in imgs1"
+                :key="img.id"
+                class="image-card"
+                shadow="hover"
+              >
+                <el-button class="button-open-img" type="text" @click="openImg(img.value)">
+                  <img :src="img.value" class="image">
+                </el-button>
+              </el-card>
+            </div>
+            <div class="image-win related-image-win image-2" v-else-if="flag==2" key="b">
+              <el-card
+                :body-style="{ padding: '0px'}"
+                v-for="img in imgs2"
+                :key="img.id"
+                class="image-card"
+                shadow="hover"
+              >
+                <el-button class="button-open-img" type="text" @click="openImg(img.value)">
+                  <img :src="img.value" class="image">
+                </el-button>
+              </el-card>
+            </div>
+          </transition>
         </get-height>
-  
       </el-col>
     </el-row>
 
     <el-row type="flex" justify="end">
       <el-col :span="3" :pull="3">
-        <el-button type="success" round icon="el-icon-refresh" @click="show = !show,shiftImgs()">换一批</el-button>
+        <transition name="slide-fade-right">
+          <el-button
+            v-show="showShiftButton"
+            type="success"
+            round
+            icon="el-icon-refresh"
+            @click="shiftImgs()"
+          >换一批</el-button>
+        </transition>
       </el-col>
     </el-row>
   </div>
@@ -49,13 +56,12 @@ import imgURLProcess from "../assets/js/imgURLProcessUtil.js"
 
 export default {
   data: () => ({
-    show: true,
     imgs1: [],
     imgs2: [],
-    flag: 0, //0为第一次加载，1为当前活动窗口为imgs1，2为当前活动窗口为imgs2
-    transitionName: 'fade', //初始fade效果为fade
+    flag: 0, //0为第一次加载，1为当前活动为imgs1，2为当前活动为imgs2
+    transitionName: "slide-fade-right", //初始fade效果为fade
     tag: "",
-    respFlag: false //标记一个获得数据的flag
+    showShiftButton: false //标记一个获得数据的flag
   }),
 
   methods: {
@@ -67,7 +73,9 @@ export default {
         })
         .then(response => {
           imgURLProcess(response.data, imgs)
-          this.respFlag = true
+          setTimeout(() => this.showShiftButton = true, 200)
+
+
         }
         )
     },
@@ -78,13 +86,14 @@ export default {
         this.fetchImgs(this.imgs2)
         this.flag = 1
         this.transitionName = 'slide-fade-right' //fade效果变更
+
       }
-      else if (this.flag === 1) {//切换为imgs2，刷新imgs1数据
+      else if (this.flag === 1) {//=1,切换为imgs2，刷新imgs1数据
         this.imgs1 = []
         this.fetchImgs(this.imgs1)
         this.flag = 2
       }
-      else if (this.flag === 2) {//切换为imgs1，刷新imgs2数据
+      else if (this.flag === 2) {//=2,切换为imgs1，刷新imgs2数据
         this.imgs2 = []
         this.fetchImgs(this.imgs2)
         this.flag = 1
@@ -102,14 +111,17 @@ export default {
 
   },
 
-
   created() {
-      this.$bus.$on("classifyResult",
+    this.$bus.$on("classifyResult",
       tag => {
-        if(tag != null){
+        if (tag != null) {
           this.tag = tag
+          if (this.flag != 0) { //当不是第一次加载组件时，再下载一次图片，防止因为缓存问题，导致显示上次的结果
+            this.shiftImgs()
+          }
           this.shiftImgs()
         }
+
       }
     )
   },
