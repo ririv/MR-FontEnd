@@ -20,7 +20,8 @@ export default {
 
   methods: {
     getHeight() {
-      let offsetHeight = document.getElementById("parent").firstElementChild.offsetHeight
+      // let offsetHeight = document.getElementById("parent").firstElementChild.offsetHeight
+      let offsetHeight = this.$slots.default[0].elm.offsetHeight //插槽可以使用此方式获得元素
       if (offsetHeight != 0) { //防止出现数据刷新过快（频繁点击事件），元素未渲染好，height为0的bug
         this.height = offsetHeight
         // console.log(offsetHeight)

@@ -59,7 +59,8 @@ export default {
         .post("login", qs.stringify(this.loginParams), {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
-          }
+          },
+          baseURL: this.rootURL
         })
         .then(response => {
           sessionStorage.username = response.data.username
@@ -67,6 +68,7 @@ export default {
         })
     }
   }
+
 }
 </script>
 

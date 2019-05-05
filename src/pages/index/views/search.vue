@@ -66,7 +66,7 @@ export default {
   methods: {
     fetchData() {
       this.axios
-        .get("api/v1/img/query", {
+        .get("img/query", {
           params: {
             tag: this.$route.query.tag,
             size: this.pageSize,
@@ -80,10 +80,8 @@ export default {
     },
 
     openImg(src) {
-      this.$alert('<img class="message-image" src="' + src + '"/>', '查看图片', {
-        dangerouslyUseHTMLString: true
-      })
-    },
+      this.$alert(<img class="message-image" src={src}>查看图片</img>,"查看图片")
+    }
   },
 
   created() {

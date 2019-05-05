@@ -67,7 +67,7 @@ export default {
   methods: {
     fetchImgs(imgs) {
       this.axios
-        .get("api/v1/img/related-query", {
+        .get("img/related-query", {
           params:
             { tag: this.tag, num: "10" }
         })
@@ -101,10 +101,9 @@ export default {
     },
 
     openImg(src) {
-      this.$alert('<img class="message-image" src="' + src + '"/>', '查看图片', {
-        dangerouslyUseHTMLString: true
-      });
+      this.$alert(<img class="message-image" src={src}>查看图片</img>,"查看图片") //使用jsx语法
     }
+
   },
 
   mounted() {

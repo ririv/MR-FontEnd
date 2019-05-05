@@ -9,6 +9,7 @@
     </div>
 
     <el-table
+      v-loading="loading"
       ref="multipleTable"
       :data="currentContent"
       tooltip-effect="dark"
@@ -34,11 +35,24 @@
 
       <el-table-column fixed="right" label="操作" width="150">
         <template slot-scope="scope">
-          <el-button size="small">编辑</el-button>
+          <el-button @click="toEditView(scope.row.id)" size="small">编辑</el-button>
           <el-button @click="openDeleteMessage(scope.row.id)" type="danger" size="small">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
+
+<el-row type="flex" justify="end">
+    <router-link :to="activeName+'/create'">
+      <el-button
+        circle
+        icon="el-icon-plus"
+        type="primary"
+        size="small"
+        @click="toCreateView"
+        class="button-create"
+      ></el-button>
+    </router-link>
+        </el-row>
 
     <div class="pagination">
       <el-pagination
@@ -46,6 +60,7 @@
         :total="totalElements"
         :current-page.sync="currentPage"
         @current-change="handleCurrentPageChange"
+        hide-on-single-page
       ></el-pagination>
     </div>
   </div>
@@ -65,10 +80,11 @@ export default {
 
       url: {
         targetQueryUrl: "",
-        adminUserQueryUrl: "api/v1/admin/user/query",
-        adminImgQueryUrl: "api/v1/admin/img/query",
-        adminModelQueryUrl: "api/v1/admin/model/query",
+        adminUserQueryUrl: "admin/user/query",
+        adminImgQueryUrl: "admin/img/query",
+        adminModelQueryUrl: "admin/model/query",
       },
+      loading: true
 
     }
   },
@@ -83,19 +99,19 @@ export default {
         .then(response => {
           this.currentContent = response.data.content
           this.totalElements = response.data.totalElements
+          this.loading = false
         }
         )
         .catch(error => {
           console.log(error)
           this.errored = true
         })
-        .finally(() => this.loading = false)
     },
 
     formatter(row, column, cellValue, index) {
-      if(row.enabled === true)
+      if (row.enabled === true)
         return "√"
-      else if(row.enabled === false)
+      else if (row.enabled === false)
         return "×"
       else
         return null
@@ -124,6 +140,29 @@ export default {
       }
       this.fetchData(this.url.targetQueryUrl, 1)
     },
+
+    toEditView(id) {
+      this.$router.push({
+        name: "operate",
+        params: {
+          class: this.activeName,
+          id,
+          operateType: "edit"
+        }
+      })
+    },
+
+    toCreateView() {
+      this.$router.push({
+        name: "operate",
+        params: {
+          class: this.activeName,
+          id,
+          operateType: "edit"
+        }
+      })
+    },
+
     openDeleteMessage(id) {
       this.$confirm('此操作将永久删除该数据, 是否继续? id：' + id, '提示', {
         confirmButtonText: '确定',
@@ -131,7 +170,7 @@ export default {
         type: 'warning'
       }).then(() => {
         this.axios
-          .delete("api/v1/admin/" + this.activeName + "/operate/" + id)
+          .delete("admin/" + this.activeName + "/operate/" + id)
           .then(resposne => {            this.$message({
               type: 'success',
               message: '删除成功!'
@@ -161,10 +200,10 @@ export default {
     computedKeys() {
       let keys = []
       for (let key in this.currentContent[0]) {
-          if (key != "enabled") {
-            keys.push(key)
-          }
+        if (key != "enabled") {
+          keys.push(key)
         }
+      }
       return keys
     }
   }
@@ -194,7 +233,8 @@ export default {
   text-align: center;
 }
 
-a {
-  padding: inherit;
+.button-create {
+  margin-top: 20px;
+  margin-right: 60px;
 }
 </style>

@@ -18,27 +18,36 @@
       </el-col>
       <el-col :xs="10" :sm="6">
         <transition name="fade">
-        <div v-if="!session.isLoggedIn">
-          <router-link to="/login">
-            <el-button class="sign">sign in</el-button>
-          </router-link>
-          <router-link to="/register">
-            <el-button class="sign">sign up</el-button>
-          </router-link>
-          <!--<div v-if="isSignedIn" class="sign">sign out</div> -->
-        </div>
-        <div v-else>
-          <el-dropdown>
-            <span class="el-dropdown-link">
-                                    <i class="el-icon-user-solid"></i>
-              {{ session.username }}
-              <i class="el-icon-arrow-down el-icon--right"></i>
-            </span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item><span @click="logout"><i class="el-icon-switch-button"></i>退出</span></el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-        </div>
+          <div v-if="!session.isLoggedIn">
+            <router-link to="/login">
+              <el-button class="sign">sign in</el-button>
+            </router-link>
+            <router-link to="/register">
+              <el-button class="sign">sign up</el-button>
+            </router-link>
+            <!--<div v-if="isSignedIn" class="sign">sign out</div> -->
+          </div>
+          <div v-else>
+            <el-dropdown>
+              <span class="el-dropdown-link">
+                <i class="el-icon-user-solid"></i>
+                {{ session.username }}
+                <i class="el-icon-arrow-down el-icon--right"></i>
+              </span>
+              <el-dropdown-menu slot="dropdown">
+                  <!-- <el-dropdown-item>
+                  <span @click="updatePassword">
+                    <i class="el-icon-key"></i>修改密码
+                  </span>
+                </el-dropdown-item> -->
+                <el-dropdown-item>
+                  <span @click="logout">
+                    <i class="el-icon-switch-button"></i>退出
+                  </span>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </div>
         </transition>
       </el-col>
     </el-row>
@@ -66,30 +75,42 @@ export default {
       })
     },
 
-    getUsername() {
-      if ("undefined" != typeof sessionStorage.username){
+    getSession() {
+      if ("undefined" != typeof sessionStorage.username) {
         this.session.username = sessionStorage.username
         this.session.isLoggedIn = true
-        this.$router.push("/")
       }
     },
 
     logout() {
       this.axios
-        .get("logout")
+        .get("logout", {
+          baseURL: this.rootURL
+        })
         .then(response => {
           this.session.isLoggedIn = false
           this.session.username = null
           sessionStorage.clear()
         })
-    }
+    },
 
+    fetchUserInfo() { //暂时用不到
+      this.axios.get("user/current")
+        .then(response => {
+          sessionStorage.username = response.data.username
+          this.getSession()
+        })
+        .catch(error => { })
+    }
   },
 
 
   created() {
-    this.$bus.$on("login", () => this.getUsername())
-    this.getUsername()
+    this.getSession() //创建组件即获取session值
+    this.$bus.$on("login", () => { //监听登录事件
+      this.getSession() //接收事件再获取session值
+      this.$router.push("/") //登录成功则跳转页面
+    })
   }
 }
 

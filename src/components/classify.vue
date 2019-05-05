@@ -69,12 +69,11 @@
 </template>
 
 <script>
-import { baseURL } from "../assets/js/axiosConfig.js"
 
 export default {
   data() {
     return {
-      url: baseURL + "api/v1/img/upload",
+      url: this.baseURL + "img/upload",
       params: {
         flag: 0
       },
@@ -167,7 +166,7 @@ export default {
     //   }
     //   console.log(file)
     //   this.axios
-    //     .post("api/v1/img/upload", formData, config)
+    //     .post("img/upload", formData, config)
     //     .then(response => {
     //       // console.log(response.data);
     //       this.result = response.data;
@@ -185,7 +184,7 @@ export default {
 
     fetchModelData() {
       this.axios
-        .get("api/v1/model/all")
+        .get("model/all")
         .then(response => this.models = response.data)
     }
   },
