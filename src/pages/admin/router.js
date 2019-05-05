@@ -11,7 +11,7 @@ export default new Router({
       component: () => import(/* webpackChunkName: "about" */ './views/home.vue')
     },
     {
-      path: '/:class/:operateType/:id',
+      path: '/:class/:operateType/:id?',
       name: 'operate',
       component: () => import('./views/operate.vue')
     }

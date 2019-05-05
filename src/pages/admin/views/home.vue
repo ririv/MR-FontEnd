@@ -48,7 +48,6 @@
         icon="el-icon-plus"
         type="primary"
         size="small"
-        @click="toCreateView"
         class="button-create"
       ></el-button>
     </router-link>
@@ -152,19 +151,9 @@ export default {
       })
     },
 
-    toCreateView() {
-      this.$router.push({
-        name: "operate",
-        params: {
-          class: this.activeName,
-          id,
-          operateType: "edit"
-        }
-      })
-    },
-
     openDeleteMessage(id) {
-      this.$confirm('此操作将永久删除该数据, 是否继续? id：' + id, '提示', {
+      this.$confirm(
+          (<div><span>此操作将永久删除该数据，是否继续？</span><div> id: {id}</div></div>), '提示', { //使用jsx语法
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
