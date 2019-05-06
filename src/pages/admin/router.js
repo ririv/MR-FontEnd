@@ -14,7 +14,13 @@ export default new Router({
       path: '/:class/:operateType/:id?',
       name: 'operate',
       component: () => import('./views/operate.vue')
+    },
+    {
+      path: '/details/:type',
+      name: 'details',
+      component: () => import('./views/details.vue')
     }
+
 
   ]
 })

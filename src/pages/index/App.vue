@@ -7,7 +7,7 @@
 
       <el-main>
         <transition :name="transitionName">
-          <router-view class="child-absolute-view" ref="childView"></router-view>
+          <router-view class="absolute-child-view" ref="childView"></router-view>
         </transition>
         <div class="page-component-up" style>
           <i class="el-icon-caret-top"></i>
@@ -90,7 +90,7 @@ main {
   margin-top: 20px;
 }
 
-.child-absolute-view{
+.absolute-child-view{
   left: 0;
   right: 0;
   position: absolute;

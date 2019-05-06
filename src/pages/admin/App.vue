@@ -1,14 +1,12 @@
 <template>
   <div id="app">
     <transition name="fade">
-      <router-view class="child-view"></router-view>
+      <router-view class="child-view" ref="childView"></router-view>
     </transition>
   </div>
 </template>
 
 <script>
-import imgURLProcess from "../../assets/js/imgURLProcessUtil.js"
-
 export default {
   name: "app",
   data() {

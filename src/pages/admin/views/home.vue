@@ -41,7 +41,8 @@
       </el-table-column>
     </el-table>
 
-<el-row type="flex" justify="end">
+<!--image暂时不提供创建接口-->
+<el-row type="flex" justify="end" v-if="activeName!='img'">
     <router-link :to="activeName+'/create'">
       <el-button
         circle
@@ -99,7 +100,7 @@ export default {
           this.currentContent = response.data.content
           this.totalElements = response.data.totalElements
           this.loading = false
-        }
+            }
         )
         .catch(error => {
           console.log(error)
@@ -131,11 +132,9 @@ export default {
       }
       else if (tab.name === "img") {
         this.url.targetQueryUrl = this.url.adminImgQueryUrl
-
       }
       else if (tab.name === "model") {
         this.url.targetQueryUrl = this.url.adminModelQueryUrl
-
       }
       this.fetchData(this.url.targetQueryUrl, 1)
     },
