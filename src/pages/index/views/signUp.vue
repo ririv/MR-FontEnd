@@ -1,6 +1,6 @@
 <template>
   <div id="sign-up">
-    <div class="login">
+    <div class="login" v-loading="loading">
       <div class="login-top">注册</div>
       <div class="login-center clearfix">
         <div class="login-center-icon">
@@ -64,27 +64,30 @@ export default {
         username: null,
         email:null,
         password: null
-      }
+      },
+      loading:false
     }
   },
 
   methods: {
 
     submit() {
+      this.loading = true
       this.axios
         .post("user/create", this.info)
         .then(response => {
           this.$message({
-            message: '注册成功，将为您自动登录',
+            message: <div>注册成功，将为您自动登录<icon style="margin-left:10px;" class="el-icon-loading"></icon></div>,
             type: 'success'
           })
           let self = this
           setTimeout(() => {
             sessionStorage.username = response.data.username
             self.$bus.$emit("login")
-          })
+          },3000)
         })
         .catch(error =>this.$message.error('注册失败'))
+        .finally(this.loading = false)
     }
   }
 

@@ -239,8 +239,12 @@ export default {
                   .finally(() => this.loading = false)
       }
       else {
-        this.axios
-          .post(submitURL, submitData)
+        let method = this.operateType == "create"?"post":"put"
+        this.axios({
+            method,
+            url: submitURL,
+            data: submitData
+        })
           .then(response => {
             this.handleSuccess(response.data)
           })
