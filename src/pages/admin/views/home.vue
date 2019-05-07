@@ -1,7 +1,7 @@
 <template>
   <div id="home">
     <div>
-      <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
+      <el-tabs v-model="activeName" type="card">
         <el-tab-pane label="用户管理" name="user"></el-tab-pane>
         <el-tab-pane label="图片管理" name="img"></el-tab-pane>
         <el-tab-pane label="模型管理" name="model"></el-tab-pane>
@@ -41,18 +41,12 @@
       </el-table-column>
     </el-table>
 
-<!--image暂时不提供创建接口-->
-<el-row type="flex" justify="end" v-if="activeName!='img'">
-    <router-link :to="activeName+'/create'">
-      <el-button
-        circle
-        icon="el-icon-plus"
-        type="primary"
-        size="small"
-        class="button-create"
-      ></el-button>
-    </router-link>
-        </el-row>
+    <!--image暂时不提供创建接口-->
+    <el-row type="flex" justify="end" v-if="activeName!='img'">
+      <router-link :to="activeName+'/create'">
+        <el-button circle icon="el-icon-plus" type="primary" size="small" class="button-create"></el-button>
+      </router-link>
+    </el-row>
 
     <div class="pagination">
       <el-pagination
@@ -100,7 +94,7 @@ export default {
           this.currentContent = response.data.content
           this.totalElements = response.data.totalElements
           this.loading = false
-            }
+        }
         )
         .catch(error => {
           console.log(error)
@@ -124,21 +118,6 @@ export default {
     handleSelectionChange(val) {
     },
 
-    handleClick(tab, event) {
-      this.currentPage = 1
-      this.activeName = tab.name
-      if (tab.name === "user") {
-        this.url.targetQueryUrl = this.url.adminUserQueryUrl
-      }
-      else if (tab.name === "img") {
-        this.url.targetQueryUrl = this.url.adminImgQueryUrl
-      }
-      else if (tab.name === "model") {
-        this.url.targetQueryUrl = this.url.adminModelQueryUrl
-      }
-      this.fetchData(this.url.targetQueryUrl, 1)
-    },
-
     toEditView(id) {
       this.$router.push({
         name: "operate",
@@ -152,30 +131,27 @@ export default {
 
     openDeleteMessage(id) {
       this.$confirm(
-          (<div><span>此操作将永久删除该数据，是否继续？</span><div> id: {id}</div></div>), '提示', { //使用jsx语法
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.axios
-          .delete("admin/" + this.activeName + "/operate/" + id)
-          .then(resposne => {            this.$message({
-              type: 'success',
-              message: '删除成功!'
+        (<div><span>此操作将永久删除该数据，是否继续？</span><div> id: {id}</div></div>), '提示', { //使用jsx语法
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.axios
+            .delete("admin/" + this.activeName + "/operate/" + id)
+            .then(resposne => {              this.$message({
+                type: 'success',
+                message: '删除成功!'
+              })
+              this.fetchData(this.url.targetQueryUrl, this.currentPage)
             })
-            this.fetchData(this.url.targetQueryUrl, this.currentPage)
-          })
-          .catch(error => this.$message({
-            type: 'warn',
-            message: '删除失败!'
-          }))
+            .catch(error => this.$message.error('删除失败!'))
 
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消删除'
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
         })
-      })
     }
   },
 
@@ -193,6 +169,21 @@ export default {
         }
       }
       return keys
+    }
+  },
+  watch: {
+    activeName(val) {
+      if (val === "user") {
+        this.url.targetQueryUrl = this.url.adminUserQueryUrl
+      }
+      else if (val === "img") {
+        this.url.targetQueryUrl = this.url.adminImgQueryUrl
+      }
+      else if (val === "model") {
+        this.url.targetQueryUrl = this.url.adminModelQueryUrl
+      }
+      this.fetchData(this.url.targetQueryUrl, 1)
+      this.currentPage = 1
     }
   }
 }

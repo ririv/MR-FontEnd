@@ -1,9 +1,10 @@
 <template>
   <div id="sign-in">
     <div class="login">
+      
       <div class="login-top">登录</div>
       <div class="login-center clearfix">
-        <div class="login-center-img">
+        <div class="login-center-icon">
           <i class="el-icon-user"></i>
         </div>
         <div class="login-center-input">
@@ -17,8 +18,9 @@
           <div class="login-center-input-text">用户名</div>
         </div>
       </div>
+
       <div class="login-center clearfix">
-        <div class="login-center-img">
+        <div class="login-center-icon">
           <i class="el-icon-lock"></i>
         </div>
         <div class="login-center-input">
@@ -32,7 +34,7 @@
           <div class="login-center-input-text">密码</div>
         </div>
       </div>
-      <div class="login-button" @click="login">登陆</div>
+      <div class="login-button" @click="submit">登陆</div>
     </div>
   </div>
 </template>
@@ -54,7 +56,7 @@ export default {
 
   methods: {
 
-    login() {
+    submit() {
       this.axios
         .post("login", qs.stringify(this.loginParams), {
           headers: {
@@ -66,6 +68,7 @@ export default {
           sessionStorage.username = response.data.username
           this.$bus.$emit("login")
         })
+        .catch(error =>this.$message.error('登录失败'))
     }
   }
 
@@ -117,14 +120,6 @@ table {
 }
 body {
   -webkit-text-size-adjust: none;
-}
-fieldset,
-img {
-  border: 0;
-}
-img {
-  vertical-align: top;
-  max-width: 100%;
 }
 address,
 caption,
@@ -245,7 +240,7 @@ acronym {
   padding: 0 40px;
   margin-bottom: 30px;
 }
-.login-center-img {
+.login-center-icon {
   width: 20px;
   height: 20px;
   float: left;
