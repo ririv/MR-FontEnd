@@ -73,7 +73,7 @@
 export default {
   data() {
     return {
-      url: this.baseURL + "img/upload",
+      url: this.baseURL + "img/classify",
       params: {
         flag: 0
       },
