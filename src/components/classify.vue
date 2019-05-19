@@ -31,12 +31,18 @@
       <el-col :span="4">
         <transition name="el-fade-in" mode="out-in">
           <keep-alive>
-            <el-select  v-if="activeName=='free'" v-model="modelId" clearable placeholder="默认模型">
+            <el-select v-if="activeName=='free'" v-model="modelId" clearable placeholder="默认模型">
               <el-option v-for="item in models" :key="item.id" :label="item.name" :value="item.id"></el-option>
             </el-select>
-            <span v-else-if="activeName=='clear'" class="classify-result">
-              <i class="el-icon-check icon-success"></i>
-              识别结果：{{result}}
+            <span v-else-if="activeName=='result'" class="classify-result">
+              <span v-if="respType=='success'">
+                <i class="el-icon-check icon-result icon-result-success" />
+                识别结果：{{result.tag}} {{result.proba}}
+              </span>
+              <span v-else-if="respType=='warning'" class="classify-result">
+                <i class="el-icon-warning icon-result icon-result-warning" />
+                无法识别
+              </span>
             </span>
           </keep-alive>
         </transition>
@@ -52,12 +58,12 @@
           识别
           <i class="el-icon-upload"></i>
         </el-button>
-            <i class="el-icon-loading" v-show="activeName=='load'"></i>
+        <i class="el-icon-loading" v-show="activeName=='load'"></i>
         <el-button
           :plain="true"
           size="small"
           type="danger"
-          v-show="activeName=='clear'"
+          v-show="activeName=='result'"
           @click="clearFiles()"
         >
           清空
@@ -79,14 +85,17 @@ export default {
       },
       relatedImgs: [],
       headers: { 'X-Requested-With': 'XMLHttpRequest' },
-      openMessageType: "",
-      openMessageInfo: "",
+      respType: "",
+      respInfo: "",
       loadingFlag: false,
       activeName: "free",
       modelId: null,
       models: {},
-      result: "",
-      isEmpty:true
+      result: {
+        tag: '',
+        proba: null
+      },
+      isEmpty: true
     }
   },
 
@@ -94,23 +103,23 @@ export default {
     handleSuccess(res) {
       // console.log(res)
       if (res.isSuccessful === true) {
-        this.openMessageInfo = "识别成功" + "\n" + res.tag
-        this.openMessageType = "success"
-        this.result = res.tag
+        this.respInfo = "识别成功" + "\n" + res.tag
+        this.respType = "success"
+        this.result = res
 
         this.$bus.$emit("classify", true, res.tag)
       }
       else {
-        this.openMessageInfo = "无法识别"
-        this.openMessageType = "warning"
+        this.respInfo = "无法识别"
+        this.respType = "warning"
       }
       this.openMessage()
-      this.activeName = "clear"
+      this.activeName = "result"
     },
 
-    handleError(err){
-      this.openMessageInfo = "请求失败"
-      this.openMessageType = "error"
+    handleError(err) {
+      this.respInfo = "请求失败"
+      this.respType = "error"
       this.openMessage()
       this.activeName = "free"
     },
@@ -125,8 +134,8 @@ export default {
       this.activeName = "load"
     },
 
-    handleChange(file,fileList){
-      if(fileList.length!=0){
+    handleChange(file, fileList) {
+      if (fileList.length != 0) {
         this.isEmpty = false
       }
     },
@@ -141,7 +150,7 @@ export default {
     },
 
     clickUpload() {
-      if(this.isEmpty){
+      if (this.isEmpty) {
         this.$message.error("请先选择一张图片")
       }
       this.$refs.upload.submit()
@@ -150,8 +159,8 @@ export default {
 
     openMessage() {
       this.$message({
-        message: this.openMessageInfo,
-        type: this.openMessageType
+        message: this.respInfo,
+        type: this.respType
       })
     },
 
@@ -222,14 +231,20 @@ export default {
   height: 40px;
 }
 
-.icon-success {
+.icon-result {
   margin-right: 10px;
-  color: #13ce66;
-  font-size: x-large;
+  font-size: large;
 }
 
-.absolute{
+.icon-result-success {
+  color: #13ce66;
+}
+
+.icon-result-warning {
+  color: #F56C6C;
+}
+
+.absolute {
   position: absolute;
 }
-
 </style>
