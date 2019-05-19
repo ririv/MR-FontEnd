@@ -2,7 +2,7 @@
   <div class="carousel">
     <el-carousel>
       <el-carousel-item v-for="item in items" :key="item">
-        <img :src="item" class="small">
+        <el-image :src="item" class="img" fit="fill"></el-image>
       </el-carousel-item>
     </el-carousel>
   </div>
@@ -12,7 +12,10 @@ export default {
   data() {
     return {
       items:[
-        
+        "http://localhost:8080/api/v1/file/img/home/1.jpeg",
+        "http://localhost:8080/api/v1/file/img/home/2.jpeg",
+        "http://localhost:8080/api/v1/file/img/home/3.jpeg",
+        "http://localhost:8080/api/v1/file/img/home/4.jpeg",
       ]
     }
   },
@@ -39,7 +42,12 @@ export default {
 
 
   .carousel{
-    width:700px;
-    height:200px;
+    width:400px;
+    height:300px;
+  }
+
+  .img{
+    width:inherit;
+    height:inherit;
   }
 </style>
